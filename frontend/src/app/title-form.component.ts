@@ -15,8 +15,8 @@ export class TitleFormComponent {
 
   model = new Title('Frontend');
 
-  onSubmit() {
-    this.titleService.getTitle(this.model.title).subscribe(result => this.model.resultTitle = result.data);
+  async onSubmit() {
+    this.model.resultTitle = await this.titleService.getTitle(this.model.title);
   }
 
 }
