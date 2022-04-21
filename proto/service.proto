@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proto;
+
+message Request {
+    string title = 1;
+}
+
+message LogEntry {
+    int64 created = 1;
+    string message = 2;
+}
+
+service TitleService {
+    rpc Log(Request) returns (LogEntry);
+}
