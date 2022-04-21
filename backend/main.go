@@ -1,50 +1,41 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
+	"practice/proto"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
+	"time"
+	"net"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
-type Response struct {
-	Data string `json:"data"`
+type server struct {
+	proto.UnimplementedTitleServiceServer
 }
 
-func handlePost(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.Error(w, "404 Not Found", http.StatusNotFound)
-		return
-	}
+func (s *server) Log(ctx context.Context, request *proto.Request) (*proto.LogEntry, error) {
+	title := request.GetTitle()
 
-	switch r.Method {
-	case "POST":
-		requestData, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "400 Bad Request", http.StatusBadRequest)
-			return
-		}
-		requestString := string(requestData)
-		fmt.Printf("Received: %s\n", requestString)
-		Data := fmt.Sprintf("Modified: %s", requestString)
-		fmt.Printf("Data: %s\n", Data)
-		response := Response{Data}
-		responseJson, err := json.Marshal(response)
-		if err != nil {
-			http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		responseJsonString := string(responseJson)
-		fmt.Printf("Responding: %s\n", responseJsonString)
-		w.Header().Add("Access-Control-Allow-Origin", "*")
-		w.Write(responseJson)
-	default:
-		http.Error(w, "405 Method Not Allowed.", http.StatusMethodNotAllowed)
-	}
+	fmt.Printf("Received: %s\n", title)
+
+	created := time.Now().UnixMilli()
+	message := fmt.Sprintf("Modified: %s", title)
+
+	return &proto.LogEntry{Created: created, Message: message}, nil
 }
 
 func main() {
-	http.HandleFunc("/", handlePost)
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	listener,err := net.Listen("tcp", ":8081")
+	if err != nil {
+		panic(err)
+	}
+
+	srv := grpc.NewServer()
+	proto.RegisterTitleServiceServer(srv, &server{})
+	reflection.Register(srv)
+
+	if e := srv.Serve(listener); e != nil {
+		panic(e)
+	}
 }
