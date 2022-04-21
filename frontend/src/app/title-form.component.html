@@ -1,0 +1,15 @@
+<h1>{{model.resultTitle}}</h1>
+<form (ngSubmit)="onSubmit()" #titleForm="ngForm">
+  <div class="form-group">
+    <label for="title">title</label>
+    <input type="text" class="form-control" id="title"
+           required
+           [(ngModel)]="model.title" name="title"
+           #title="ngModel">
+    <div [hidden]="title.valid || title.pristine"
+         class="alert alert-danger">
+      title is required
+    </div>
+  </div>
+  <button type="submit" class="btn btn-success" [disabled]="!titleForm.form.valid">Submit</button>
+</form>
