@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"practice/proto"
 	"fmt"
-	"time"
 	"net"
+	"practice/proto"
+	"time"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -26,7 +27,7 @@ func (s *server) Log(ctx context.Context, request *proto.Request) (*proto.LogEnt
 }
 
 func main() {
-	listener,err := net.Listen("tcp", ":8081")
+	listener, err := net.Listen("tcp", ":8081")
 	if err != nil {
 		panic(err)
 	}
@@ -34,6 +35,8 @@ func main() {
 	srv := grpc.NewServer()
 	proto.RegisterTitleServiceServer(srv, &server{})
 	reflection.Register(srv)
+
+	fmt.Print("Sever started, listening.\n")
 
 	if e := srv.Serve(listener); e != nil {
 		panic(e)
