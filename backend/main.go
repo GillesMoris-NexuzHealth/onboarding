@@ -36,7 +36,7 @@ func main() {
 	proto.RegisterTitleServiceServer(srv, &server{})
 	reflection.Register(srv)
 
-	fmt.Print("Sever started, listening.\n")
+	fmt.Print("Server started, listening.\n")
 
 	if e := srv.Serve(listener); e != nil {
 		panic(e)
