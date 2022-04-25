@@ -57,12 +57,25 @@ func (s *server) storeEntry(ctx context.Context, created int64, message string) 
 
 func (s *server) Log(ctx context.Context, request *proto.Request) (*proto.LogEntry, error) {
 	title := request.GetTitle()
+	if title == "last" {
+		fmt.Print("Received: 'last'\n")
+		lastEntry, err := s.getLastEntry(ctx)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Returning last entry at %d: '%s'\n", lastEntry.GetCreated(), lastEntry.GetMessage())
+		return lastEntry, nil
+	}
 
-	fmt.Printf("Received: %s\n", title)
-
+	fmt.Printf("Received: '%s'\n", title)
 	created := time.Now().UnixMilli()
 	message := fmt.Sprintf("Modified: %s", title)
+	err := s.storeEntry(ctx, created, message)
+	if err != nil {
+		panic(err)
+	}
 
+	fmt.Printf("Returning: '%s'\n", message)
 	return &proto.LogEntry{Created: created, Message: message}, nil
 }
 
