@@ -3,6 +3,7 @@
 - Protobuf compiler
 - Angular
 - Docker
+- Valid gcloud credentials in `backend/gcloud-credentials.json` with access to gcloud project `prj-nxh-moapr-spanner-dev-8104`
 
 # Running
 
