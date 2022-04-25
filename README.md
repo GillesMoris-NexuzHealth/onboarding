@@ -28,3 +28,11 @@ cd frontend
 ```
 
 Browse to `http://localhost:4200`
+
+# Reference material
+- https://angular.io/cli
+- https://angular.io/guide/forms
+- https://tutorialedge.net/golang/creating-simple-web-server-with-golang/
+- https://www.youtube.com/watch?v=Y92WWaZJl24
+- https://intuting.medium.com/using-protocol-buffers-in-angular-96b4f8ab18d4
+- https://cloud.google.com/spanner/docs/getting-started/go
