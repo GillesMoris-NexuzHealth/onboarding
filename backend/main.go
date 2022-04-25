@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"practice/proto"
 	"time"
 
 	"cloud.google.com/go/spanner"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -16,6 +18,41 @@ import (
 type server struct {
 	proto.UnimplementedTitleServiceServer
 	client *spanner.Client
+}
+
+func (s *server) getLastEntry(ctx context.Context) (*proto.LogEntry, error) {
+	statement := spanner.Statement{SQL: `SELECT * FROM logEntry ORDER BY created DESC LIMIT 1`}
+	iter := s.client.Single().Query(ctx, statement)
+	defer iter.Stop()
+	for {
+		row, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		var created int64
+		var message string
+		if err := row.Columns(&created, &message); err != nil {
+			return nil, err
+		}
+		return &proto.LogEntry{Created: created, Message: message}, nil
+	}
+	return nil, errors.New("No entry found")
+}
+
+func (s *server) storeEntry(ctx context.Context, created int64, message string) error {
+	fmt.Printf("Storing: '%s' at %d\n", message, created)
+	logEntryColumns := []string{"created", "message"}
+	m := []*spanner.Mutation{
+		spanner.InsertOrUpdate("logEntry", logEntryColumns, []interface{}{created, message}),
+	}
+	_, err := s.client.Apply(ctx, m)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *server) Log(ctx context.Context, request *proto.Request) (*proto.LogEntry, error) {
