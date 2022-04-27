@@ -7,6 +7,13 @@
     - Run `gcloud auth application-default login`, note location of `application_default_credentials.json`
     - Run `gcloud config set project prj-nxh-moapr-spanner-dev-8104`
     - Copy `application_default_credentials.json` to `backend/gcloud-credentials.json`
+- Spanner db on dev instance `csp-moapr-dev` called `onboarding-gilles` with the following table DDL:
+    ```
+    CREATE TABLE logEntry (
+      created INT64 NOT NULL,
+      message STRING(MAX) NOT NULL,
+    ) PRIMARY KEY(created);
+    ```
 
 # Running
 
